@@ -19,4 +19,4 @@
 - Prometheus
   - https://prometheus.io/docs/instrumenting/writing_exporters/
 - Qiita (Japanese Web Site)
-  - https://qiita.com/ryojsb/items/256f1d205a83ae772f39#comment-620e627d064f1f19bcd8
+  - https://qiita.com/ryojsb/items/256f1d205a83ae772f39
