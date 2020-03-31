@@ -3,7 +3,6 @@ package main
 import (
 	"strconv"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os/exec"
@@ -15,49 +14,47 @@ import (
 )
 
 const (
-	namespace = "ClpMetric"
+	namespace = "ecx"
 )
 
 type myCollector struct{}
 
 var (
-	exampleCount = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: namespace,
-		Name:      "example_count",
-		Help:      "example counter help",
-	})
 	exampleGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "example_gauge",
-		Help:      "example gauge help",
+		Name:      "monitor_elapsed_time",
+		Help:      "monitor elapsed time  [msec]",
 	})
 )
 
 func (c myCollector) Describe(ch chan<- *prometheus.Desc) {
-	ch <- exampleCount.Desc()
 	ch <- exampleGauge.Desc()
 }
 
 func (c myCollector) Collect(ch chan<- prometheus.Metric) {
 	out, err := exec.Command("/bin/sh", "./getelaps.sh").Output()
 	if err != nil {
-//		fmt.Println("ERROR!")
+		ch <- prometheus.MustNewConstMetric(
+			exampleGauge.Desc(),
+			prometheus.GaugeValue,
+			float64(0),
+		)
+	} else {
+		f, err := strconv.ParseFloat(strings.TrimRight(*(*string)(unsafe.Pointer(&out)), "\n"), 64)
+		if err != nil {
+			ch <- prometheus.MustNewConstMetric(
+				exampleGauge.Desc(),
+				prometheus.GaugeValue,
+				float64(0),
+			)
+		} else {
+			ch <- prometheus.MustNewConstMetric(
+				exampleGauge.Desc(),
+				prometheus.GaugeValue,
+				float64(f),
+			)
+		}
 	}
-	fmt.Println(out)
-	fmt.Printf("%s\n", string(out))
-	f, err := strconv.ParseFloat(strings.TrimRight(*(*string)(unsafe.Pointer(&out)), "\n"), 64)
-	fmt.Println(f)
-
-	ch <- prometheus.MustNewConstMetric(
-		exampleCount.Desc(),
-		prometheus.CounterValue,
-		float64(f),
-	)
-	ch <- prometheus.MustNewConstMetric(
-		exampleGauge.Desc(),
-		prometheus.GaugeValue,
-		float64(f),
-	)
 }
 
 var (
