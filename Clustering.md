@@ -39,18 +39,13 @@
 1. Start the failover group on the server1.
 1. Download Prometheus binary file and copy it to the server1.
    - https://prometheus.io/download/
-1. Expand the archive file and rename the directory (e.g. prometheus-2.21.0).
+1. Expand the archive file and rename the directory (e.g. prometheus).
 1. Copy the directory to /mnt/md1 on the server1.
-1. Move to cd /usr/lib/systemd/system and create prometheus.service file on the server1 and the server2.
-   ```
-   [Service]
-   Type=simple
-   ExecStart=/mnt/md1/prometheus-2.21.0/prometheus --config.file=/mnt/md1/prometheus-2.21.0/prometheus.yml
-   ExecStop=/bin/kill -TERM ${MAINPID}
-   ExecStop=/bin/kill -HUP ${MAINPID}
-   
-   [Install]
-   WantedBy=multi-user.target
+   ```sh
+   # ll /mnt/md1
+   total 20
+   drwx------ 2 root root 16384 Sep 18 16:17 lost+found
+   drwxr-xr-x 5 3434 3434  4096 Sep 19 07:08 prometheus
    ```
 1. Start a web browser and access to Cluster WebUI (e.g. http://(IP address of server1):29003).
 1. Add exec resource as below.
@@ -61,12 +56,27 @@
    |Stop script |stop.sh |
    - start.sh
      ```sh
-     systemctl start prometheus.service
+     #! /bin/sh
+     #***************************************
+     #*              start.sh               *
+     #***************************************
+     
+     #ulimit -s unlimited
+     
+     cd /mnt/md1/prometheus
+     ./prometheus &
      exit 0
      ```
    - stop.sh
      ```sh
-     systemctl stop prometheus.service
+     #! /bin/sh
+     #***************************************
+     #*               stop.sh               *
+     #***************************************
+     
+     #ulimit -s unlimited
+     
+     kill -s 9 `pgrep prometheus`
      exit 0
      ```
 1. Add HTTP monitor resource (*) as below.
@@ -80,6 +90,6 @@
    |Recovery Target           |exec-p8s|
    |Maximum Reactivation Count|1|
    |Maximum Failover Count    |1|
-
    - (*) You need to pruchase Internet Server Agent license.
 1. Apply the configuration and start the cluster.
+1. Start a web browser and access to Prometheus (e.g. http://(floating IP address):9090).
