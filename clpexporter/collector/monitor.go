@@ -1,11 +1,11 @@
 package collector
 
 import (
-//	"strconv"
-//	"log"
-//	"os/exec"
-//	"strings"
-//	"unsafe"
+	"strconv"
+	"fmt"
+	"os/exec"
+	"strings"
+	"unsafe"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -25,31 +25,42 @@ func NewMonitorCollector() (Collector, error) {
 }
 
 func (c *monitorCollector) Update(ch chan<- prometheus.Metric) error {
-/*
+	var metricType prometheus.ValueType
+	metricType = prometheus.GaugeValue
 	out, err := exec.Command("/bin/sh", "./getelaps.sh").Output()
 	if err != nil {
 		ch <- prometheus.MustNewConstMetric(
-			exampleGauge.Desc(),
-			prometheus.GaugeValue,
-			float64(0),
+			prometheus.NewDesc(
+				prometheus.BuildFQName(namespace, subsystem, "test"),
+				fmt.Sprintf("Monitor"),	
+				nil, nil,
+			),
+			metricType, float64(0),
 		)
 	} else {
 		f, err := strconv.ParseFloat(strings.TrimRight(*(*string)(unsafe.Pointer(&out)), "\n"), 64)
+		fmt.Printf("f: %v\n", float64(f))
 		if err != nil {
 			ch <- prometheus.MustNewConstMetric(
-				exampleGauge.Desc(),
-				prometheus.GaugeValue,
-				float64(0),
+				prometheus.NewDesc(
+					prometheus.BuildFQName(namespace, subsystem, "test"),
+					fmt.Sprintf("Monitor"),	
+					nil, nil,
+				),
+				metricType, float64(0),
 			)
 		} else {
 			ch <- prometheus.MustNewConstMetric(
-				exampleGauge.Desc(),
-				prometheus.GaugeValue,
-				float64(f),
+				prometheus.NewDesc(
+					prometheus.BuildFQName(namespace, subsystem, "test"),
+					fmt.Sprintf("Monitor"),	
+					nil, nil,
+				),
+				metricType, float64(f),
 			)
 		}
 	}
-*/
+
 	return nil
 }
 
