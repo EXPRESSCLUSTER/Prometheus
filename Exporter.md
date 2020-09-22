@@ -1,71 +1,39 @@
-# How to Use Exporter
+# How to Deploy Exporter for EXPRESSCLUSTER X
 
 ## Overview
-- Prometheus and EXPRESSCLUSTER run on different servers.
+- EXPRESSCLUSTER X and clpexporter run on the same server.
   ```
-                +--------------+
-                | CentOS       |
-                | - Prometheus |
-                +------+-------+
-                       |
-          +------------+---------+
-          |                      |
-  +-------+----------+   +-------+----------+
-  | CentOS           |   | CentOS           |
-  | - EXPRESSCLUSTER |   | - EXPRESSCLUSTER |
-  +------------------+   +------------------+
+                  +--------------+
+                  | CentOS       |
+                  | - Prometheus |
+                  +------+-------+
+                         |
+          +--------------+---------+
+          |                        |
+  +-------+------------+   +-------+------------+
+  | CentOS             |   | CentOS             |
+  | - EXPRESSCLUSTER X |   | - EXPRESSCLUSTER X |
+  | - clpexporter      |   | - clpexporter      | 
+  +--------------------+   +--------------------+
   ```
 
 ## Run Exporter for EXPRESSCLUSTER
 1. Install EXPRESSCLUSTER and create a cluster.
-1. Install Golang and the library for Prometheus.
-   - Install Golang.
-     - https://golang.org/doc/install
-   - Install the library.
-     ```sh
-     # go get github.com/prometheus/client_golang/prometheus
-     ```
-1. Clone go source file and shell script.
-   ```sh
-   # git clone https://github.com/EXPRESSCLUSTER/Prometheus.git
-   ```
-1. Change the following parameter in getelaps.sh to match your environment.
-   ```sh
-   # set monitor name
-   mon="genw" 
-   ```
-1. Run the following command with root account.
-   ```sh
-   # go run main.go
-   ```
-
-## Run Prometheus
-1. Download Prometheus binary file from https://prometheus.io/download/.
-1. Expand the file.
-   ```sh
-   $ tar xzvf prometheus-2.17.1.linux-amd64.tar.gz
-   ```
-1. Move to prometheus directory.
-   ```sh
-   $ cd prometheus-2.17.1.linux-amd64
-   ```
-1. Open prometheus.yml and add exporter IP address and port number.
+1. Download clpexporter.
+1. Run clpexporter.
+1. Edit prometheus.yml file asbelow and run Prometheus.
    ```yaml
        static_configs:
-       - targets: ['<IP Address of the Primary Server>:9090', '<IP Address of the Secondary Server>:9090']
-   ```
-1. Run Prometheus.
-   ```sh
-   $ ./prometheus --config.file=prometheus.yml
+               - targets: ['<IP address of the primary server>:29090', '<IP address of the secondary server>:29090']   
    ```
 1. Start web browser and access the following address.
    ```
    htt://<IP Address of Prometheus>:9090
    ```
-1. Select **ecx_monitor_elapsed_time** and click execute. You can get the elapsed time [msec] of the monitor resource.
+1. Select **clp_monitor_(monitor resoruce name)** and click execute. You can get the elapsed time [msec] of the monitor resource.
 
 ## Reference
-- Prometheus
+- Prometheus Exporter
   - https://prometheus.io/docs/instrumenting/writing_exporters/
-- Qiita (written in Japanese)
-  - https://qiita.com/ryojsb/items/256f1d205a83ae772f39
+- Sample Exporter
+  - https://github.com/hirano00o/sample-exporter
